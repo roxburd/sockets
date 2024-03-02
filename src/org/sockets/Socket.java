@@ -42,7 +42,7 @@ public class Socket {
                     String cmdOut = executor.cycle();
                     dOut.writeUTF(cmdOut);
                     if (Executor.HIT_REPORT_STRING.equals(dIn.readUTF())) {
-                        System.out.println("We hit them at address " + cmdOut);
+                        System.out.println("===> " + Executor.HIT_REPORT_STRING);
                     }
                 }
                 String cmdIn = dIn.readUTF();

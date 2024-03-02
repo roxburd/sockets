@@ -1,53 +1,59 @@
 package org.sockets;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class Executor {
     public static final String HIT_REPORT_STRING = "HIT";
-    /*pkg-priv*/ static Map<String, Integer> assembly = new HashMap<>();
     private int[] program = new int[Socket.MAX_PROGRAM_SIZE];
     private int counter;
     private Integer pendingInstruction = null;
     private int add;
 
+    enum Instructions {
+        NOP,
+        JMP,  // Takes address
+        LOC,  // Takes increment to add
+        WRT
+    }
+
     public Executor(int[] program) {
         this.program = program;
-        assembly.put("NOP", 0);
-        assembly.put("JMP", 1);  // Takes address
-        assembly.put("LOC", 2);  // Takes increment to add
-        assembly.put("WRT", 3);
         counter = 0;
     }
 
     public String cycle() throws InvalidMemoryAddressException, InvalidInstructionException, InvalidPendingInstructionException {
-        System.out.print("executing address " + counter + " ");
-        Socket.showProg(program);
         String retval = "";
         try {
             if (pendingInstruction == null) {  // Look for instruction.
-                switch(program[counter]) {
-                    case 1:  // JMP
-                    case 2:  // LOC
+                Instructions instruction = Instructions.values()[program[counter]];
+                switch(instruction) {
+                    case JMP:
+                    case LOC:
                         pendingInstruction = program[counter];
                         break;
-                    case 3:  // WRT
+                    case WRT:
                         retval = String.valueOf(add);
-                        System.out.println("Writing to " + add);
-                        // fall-through
-                    case 0:  // NOP
+                        System.out.println(String.format("0x%04X " + Instructions.values()[program[counter]], counter) +
+                                " (add = " + add + ")");
+                        pendingInstruction = null;
+                        break;
+                    case NOP:
+                        System.out.println(String.format("0x%04X " + Instructions.values()[program[counter]], counter));
                         pendingInstruction = null;
                         break;
                     default:
                         throw new InvalidInstructionException(program[counter], counter);
                 }
             } else {  // Look for instruction's operand.
-                switch(pendingInstruction) {
-                    case 1:  // JMP
+                Instructions instruction = Instructions.values()[pendingInstruction];
+                switch(instruction) {
+                    case JMP:
+                        System.out.println(String.format("0x%04X " + Instructions.values()[pendingInstruction] +
+                                " " + program[counter], counter));
                         counter = program[counter] - 1;
                         break;
-                    case 2:  // LOC
+                    case LOC:
                         add += program[counter];
+                        System.out.println(String.format("0x%04X " + Instructions.values()[pendingInstruction] +
+                                " " + program[counter], counter));
                         break;
                     default:
                         throw new InvalidPendingInstructionException(pendingInstruction, counter);

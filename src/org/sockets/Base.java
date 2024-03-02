@@ -82,7 +82,7 @@ public class Base {
     }
 
     public static void main(String[] args) throws IOException {
-        System.out.println("Starting org.sockets.Base.");
+        System.out.println("Starting org.sockets.Base...");
         Base main = new Base();
         main.go();
     }
