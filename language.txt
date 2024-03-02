@@ -1,0 +1,30 @@
+
+One instruction per line.
+
+Max 1024 bytes. Each command and each operand take one byte. Address space starts at 0.
+
+Values are in hex.
+
+Labels are alphbetic only and their definitions start with a colon, e.g. :myLabel
+
+Addresses 0 and 1 are protected addresses - they cannot be written to.
+
+Registers:
+add -- address to write to on target.
+At start of execution, all registers are set to zero.
+
+Commands (code MNEMONIC <operand> -- description):
+0 NOP   -- no operation (does nothing).
+1 JMP x -- jump to instruction at address x (which may be a label).
+2 LOC x -- increment add by x; negative numbers can be used.
+3 WRT   -- write the value 0 (NOP) to location LOC on target.
+
+Example (just overwrites addresses incrementally, starting at address 0):
+NOP
+:myLabel
+WRT
+LOC 1
+JMP myLabel
+
+The example above compiles to:
+0 3 2 1 1
